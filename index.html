@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bandleng Live – Replica Fashion Picnic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --black: #0a0a0a;
+      --gold: #d4a853;
+      --gold-light: #f0d68a;
+      --gold-dark: #b8862c;
+      --white: #fefefe;
+      --beige: #f5f0e8;
+      --beige-dark: #e8dfd0;
+      --emerald: #0d5c3e;
+      --emerald-light: #1a7a55;
+      --glass-bg: rgba(255, 255, 255, 0.06);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --shadow-lux: 0 20px 60px rgba(0, 0, 0, 0.5);
+      --shadow-gold: 0 8px 32px rgba(212, 168, 83, 0.3);
+      --font-display: 'Playfair Display', serif;
+      --font-body: 'Inter', sans-serif;
+      --font-accent: 'Cormorant Garamond', serif;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: var(--font-body);
+      background: var(--black);
+      color: var(--white);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 3px; }
+
+    /* ─── Particles ─── */
+    #particles-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ─── Glass utility ─── */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px) saturate(1.2);
+      -webkit-backdrop-filter: blur(18px) saturate(1.2);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+    }
+    .glass-gold {
+      background: linear-gradient(135deg, rgba(212,168,83,0.10), rgba(212,168,83,0.04));
+      backdrop-filter: blur(18px) saturate(1.2);
+      -webkit-backdrop-filter: blur(18px) saturate(1.2);
+      border: 1px solid rgba(212,168,83,0.25);
+      border-radius: 20px;
+    }
+
+    /* ─── Reveal animation ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(50px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── Shimmer ─── */
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(212,168,83,0.2); }
+      50% { box-shadow: 0 0 40px rgba(212,168,83,0.5); }
+    }
+    @keyframes holographic {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scaleCheck {
+      0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+      60% { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+    @keyframes shimmerGold {
+      0% { background-position: -400% 0; }
+      100% { background-position: 400% 0; }
+    }
+
+    /* ─── HERO ─── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      z-index: 1;
+    }
+    #hero-bg {
+      position: absolute;
+      inset: -40px;
+      background: url('images/background.jpeg') center center / cover no-repeat;
+      filter: brightness(0.35) saturate(1.1);
+      z-index: 0;
+    }
+    #hero-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.7) 50%, rgba(10,10,10,0.95) 100%),
+        radial-gradient(ellipse at 50% 0%, rgba(212,168,83,0.15) 0%, transparent 70%);
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 2rem;
+      max-width: 820px;
+    }
+    .hero-logo {
+      height: 80px;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 4px 20px rgba(212,168,83,0.3));
+      animation: float 6s ease-in-out infinite;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 1.1;
+      background: linear-gradient(135deg, var(--gold-light), var(--white), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-subtitle {
+      font-family: var(--font-accent);
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--gold-light);
+      margin: 0.5rem 0 1rem;
+      letter-spacing: 0.15em;
+    }
+    .hero-tagline {
+      font-size: clamp(0.9rem, 1.4vw, 1.15rem);
+      font-weight: 300;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 0.1em;
+      margin-bottom: 2rem;
+    }
+    .hero-divider {
+      width: 120px;
+      height: 1px;
+      margin: 1.5rem auto;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    /* Verification badge */
+    .verify-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 1.8rem;
+      background: rgba(212,168,83,0.12);
+      border: 1px solid rgba(212,168,83,0.35);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--gold-light);
+      letter-spacing: 0.08em;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(8px);
+    }
+    .hero-banner-wrap {
+      margin: 2rem auto 0;
+      max-width: 600px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 60px rgba(212,168,83,0.06);
+      border: 1px solid rgba(212,168,83,0.15);
+    }
+    .hero-banner-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .verify-badge .check-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: var(--emerald);
+      border-radius: 50%;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      animation: scaleCheck 0.6s ease forwards;
+    }
+
+
+
+    /* ─── SECTION COMMON ─── */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 1.5rem;
+    }
+    .section-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-family: var(--font-accent);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      text-align: center;
+      color: var(--white);
+      margin-bottom: 0.8rem;
+    }
+    .section-title span {
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .section-sub {
+      text-align: center;
+      color: rgba(255,255,255,0.55);
+      font-weight: 300;
+      font-size: 1.05rem;
+      max-width: 600px;
+      margin: 0 auto 3rem;
+      line-height: 1.7;
+    }
+    .section-divider {
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto 3rem;
+    }
+
+    /* ─── DIGITAL TICKET ─── */
+    #ticket-section {
+      background: linear-gradient(180deg, rgba(10,10,10,1) 0%, rgba(13,92,62,0.06) 50%, rgba(10,10,10,1) 100%);
+    }
+    .ticket-card {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .ticket-card::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent, rgba(212,168,83,0.06), transparent, rgba(212,168,83,0.06), transparent);
+      animation: holographic 8s linear infinite;
+      pointer-events: none;
+    }
+    .ticket-card > * { position: relative; z-index: 1; }
+    .ticket-card .ticket-qr {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 1.5rem;
+      background: white;
+      padding: 8px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ticket-card .ticket-qr img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .ticket-verified {
+      text-align: center;
+      padding: 1.8rem 0 0.5rem;
+    }
+    .ticket-verified .tv-ring {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 30% 30%, rgba(212,168,83,0.12), rgba(212,168,83,0.04));
+      box-shadow: 0 0 30px rgba(212,168,83,0.15), inset 0 0 30px rgba(212,168,83,0.04);
+      animation: pulse-glow 3s ease-in-out infinite;
+      position: relative;
+    }
+    .ticket-verified .tv-ring::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1px solid rgba(212,168,83,0.2);
+      animation: float 4s ease-in-out infinite;
+    }
+    .ticket-verified .tv-check {
+      font-size: 2rem;
+      color: #22c55e;
+      animation: scaleCheck 0.6s ease forwards;
+      filter: drop-shadow(0 0 8px rgba(34,197,94,0.4));
+    }
+    .ticket-verified .tv-label {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      color: var(--gold-light);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+    .ticket-verified .tv-sub {
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.06em;
+    }
+
+    /* ─── EVENT DETAILS ─── */
+    #details {
+      background: linear-gradient(180deg, rgba(10,10,10,1) 0%, rgba(212,168,83,0.04) 50%, rgba(10,10,10,1) 100%);
+    }
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+    .detail-card {
+      padding: 2rem 1.5rem;
+      text-align: center;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .detail-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 40px rgba(212,168,83,0.12);
+    }
+    .detail-card .dc-icon {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .detail-card h4 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--gold-light);
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.06em;
+    }
+    .detail-card p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.6);
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    /* ─── FASHION EXPERIENCE ─── */
+    #fashion {
+      background: var(--black);
+    }
+
+
+    /* ─── COUNTDOWN ─── */
+    #countdown {
+      background: var(--black);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #countdown::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(212,168,83,0.06), transparent 70%);
+    }
+    .countdown-grid {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+    .countdown-block {
+      min-width: 100px;
+    }
+    .countdown-block .cd-num {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 700;
+      background: linear-gradient(180deg, var(--gold-light), var(--gold-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    .countdown-block .cd-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.4);
+      margin-top: 0.5rem;
+    }
+    .countdown-sep {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      color: var(--gold-dark);
+      opacity: 0.4;
+      align-self: center;
+    }
+
+    /* ─── AUTHENTICITY ─── */
+    #authenticity {
+      background: linear-gradient(180deg, rgba(10,10,10,1) 0%, rgba(212,168,83,0.05) 50%, rgba(10,10,10,1) 100%);
+    }
+    .auth-card {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 3rem 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      left: -60px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(212,168,83,0.08), transparent);
+      border-radius: 50%;
+    }
+    .auth-card .auth-seal {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      color: var(--gold);
+      background: rgba(212,168,83,0.06);
+      animation: pulse-glow 3s infinite;
+    }
+    .auth-card h3 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--gold-light);
+      margin-bottom: 0.8rem;
+    }
+    .auth-card .auth-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      margin: 1.5rem 0;
+    }
+    .auth-card .auth-list .al-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.7);
+    }
+    .auth-card .auth-list .al-item .check {
+      color: #22c55e;
+      font-weight: 700;
+    }
+    .auth-card .auth-notice {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.4);
+      font-style: italic;
+      margin-top: 1.2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(212,168,83,0.12);
+    }
+
+    /* ─── SOCIAL ─── */
+    #social {
+      background: var(--black);
+      text-align: center;
+    }
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin: 2rem 0 3rem;
+    }
+    .social-link {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.7rem 1.8rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 50px;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+    .social-link:hover {
+      background: rgba(212,168,83,0.1);
+      border-color: var(--gold);
+      color: var(--gold-light);
+      transform: translateY(-2px);
+    }
+    .social-link .social-icon {
+      font-size: 1.2rem;
+    }
+    .social-feed {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.8rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .social-feed .sf-item {
+      aspect-ratio: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: rgba(255,255,255,0.08);
+      transition: all 0.3s ease;
+    }
+    .social-feed .sf-item:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(212,168,83,0.04);
+    }
+
+    /* ─── FOOTER ─── */
+    #footer {
+      background: linear-gradient(180deg, rgba(10,10,10,1) 0%, #050505 100%);
+      border-top: 1px solid rgba(212,168,83,0.08);
+      padding: 4rem 1.5rem 2rem;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto 2.5rem;
+    }
+    .footer-col h4 {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--gold-light);
+      margin-bottom: 0.8rem;
+      letter-spacing: 0.06em;
+    }
+    .footer-col p, .footer-col a {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.8;
+      text-decoration: none;
+      display: block;
+    }
+    .footer-col a:hover {
+      color: var(--gold-light);
+    }
+    .footer-bottom {
+      text-align: center;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 0.06em;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-bottom .fb-logo {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.15em;
+    }
+    .sponsor-logos {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0 2rem;
+      opacity: 0.5;
+    }
+    .sponsor-logos .sp-logo {
+      height: 30px;
+      filter: grayscale(1) brightness(2);
+      opacity: 0.5;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      section { padding: 4rem 1rem; }
+      .entry-pass { padding: 1.5rem; }
+      .entry-pass .pass-body { gap: 0.8rem; }
+      .ticket-card { padding: 1.5rem; }
+      .ticket-card .ticket-details { grid-template-columns: 1fr; }
+      .countdown-grid { gap: 1rem; }
+      .countdown-block { min-width: 70px; }
+      .countdown-block .cd-num { font-size: 2.2rem; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .ticket-info-row { flex-direction: column; gap: 0.6rem; }
+      .social-feed { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ PARTICLES ═══ -->
+  <canvas id="particles-canvas"></canvas>
+
+
+  <!-- ═══ HERO ═══ -->
+  <section id="hero">
+    <div id="hero-bg"></div>
+    <div id="hero-overlay"></div>
+
+    <div class="hero-content">
+      <img src="images/logo.jpeg" alt="Bandleng Live" class="hero-logo" />
+
+      <div class="verify-badge">
+        <span class="check-icon">&#10003;</span>
+        Official Ticket Verified
+      </div>
+
+      <h1 class="hero-title">Bandleng Live</h1>
+      <p class="hero-subtitle">Replica Fashion Picnic</p>
+      <div class="hero-divider"></div>
+      <p class="hero-tagline">"Where Fashion Meets Lifestyle, Culture, and Experience."</p>
+
+      <div class="hero-banner-wrap">
+        <img src="images/banner.jpeg" alt="Bandleng Live - Replica Fashion Picnic" class="hero-banner" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ DIGITAL TICKET ═══ -->
+  <section id="ticket-section">
+    <div class="section-container">
+      <p class="section-label">Digital Pass</p>
+      <h2 class="section-title">Your <span>Ticket Experience</span></h2>
+      <div class="section-divider"></div>
+
+      <div class="ticket-card glass-gold">
+        <div class="ticket-qr">
+          <svg viewBox="0 0 100 100" width="100%" height="100%">
+            <rect width="100" height="100" fill="#fff"/>
+            <rect x="8" y="8" width="18" height="18" fill="#0a0a0a" rx="2"/>
+            <rect x="30" y="8" width="12" height="18" fill="#0a0a0a" rx="2"/>
+            <rect x="54" y="8" width="18" height="12" fill="#0a0a0a" rx="2"/>
+            <rect x="8" y="30" width="18" height="12" fill="#0a0a0a" rx="2"/>
+            <rect x="30" y="30" width="12" height="12" fill="#0a0a0a" rx="2"/>
+            <rect x="54" y="24" width="12" height="18" fill="#0a0a0a" rx="2"/>
+            <rect x="70" y="8" width="18" height="30" fill="#0a0a0a" rx="2"/>
+            <rect x="8" y="46" width="18" height="18" fill="#0a0a0a" rx="2"/>
+            <rect x="30" y="46" width="12" height="12" fill="#0a0a0a" rx="2"/>
+            <rect x="46" y="46" width="18" height="12" fill="#0a0a0a" rx="2"/>
+            <rect x="70" y="46" width="18" height="18" fill="#0a0a0a" rx="2"/>
+            <rect x="8" y="68" width="12" height="18" fill="#0a0a0a" rx="2"/>
+            <rect x="24" y="68" width="18" height="12" fill="#0a0a0a" rx="2"/>
+            <rect x="54" y="62" width="12" height="12" fill="#0a0a0a" rx="2"/>
+            <rect x="70" y="70" width="12" height="18" fill="#0a0a0a" rx="2"/>
+            <rect x="24" y="84" width="18" height="12" fill="#0a0a0a" rx="2"/>
+            <rect x="54" y="78" width="18" height="18" fill="#0a0a0a" rx="2"/>
+            <rect x="78" y="84" width="12" height="12" fill="#0a0a0a" rx="2"/>
+          </svg>
+        </div>
+        <div class="ticket-verified">
+          <div class="tv-ring">
+            <div class="tv-check">&#10003;</div>
+          </div>
+          <div class="tv-label">Verified Ticket</div>
+          <div class="tv-sub">Authenticated &amp; Authorised for Entry</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ EVENT DETAILS ═══ -->
+  <section id="details">
+    <div class="section-container">
+      <p class="section-label">Event Information</p>
+      <h2 class="section-title">The <span>Experience</span></h2>
+      <div class="section-divider"></div>
+      <div class="details-grid">
+        <div class="detail-card glass reveal">
+          <span class="dc-icon">&#128197;</span>
+          <h4>Event Date</h4>
+          <p>5 September 2026</p>
+        </div>
+        <div class="detail-card glass reveal">
+          <span class="dc-icon">&#9200;</span>
+          <h4>Time</h4>
+          <p>10:00 AM – Till Late</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- ═══ COUNTDOWN ═══ -->
+  <section id="countdown">
+    <div class="section-container">
+      <p class="section-label">Anticipation</p>
+      <h2 class="section-title">Countdown to the Ultimate<br/><span>Fashion Picnic Experience</span></h2>
+      <div class="section-divider"></div>
+      <div class="countdown-grid" id="countdown-grid">
+        <div class="countdown-block">
+          <div class="cd-num" id="cd-days">00</div>
+          <div class="cd-label">Days</div>
+        </div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-block">
+          <div class="cd-num" id="cd-hours">00</div>
+          <div class="cd-label">Hours</div>
+        </div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-block">
+          <div class="cd-num" id="cd-minutes">00</div>
+          <div class="cd-label">Minutes</div>
+        </div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-block">
+          <div class="cd-num" id="cd-seconds">00</div>
+          <div class="cd-label">Seconds</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ AUTHENTICITY ═══ -->
+  <section id="authenticity">
+    <div class="section-container">
+      <p class="section-label">Security</p>
+      <h2 class="section-title">Authenticity <span>&amp; Security</span></h2>
+      <div class="section-divider"></div>
+      <div class="auth-card glass-gold">
+        <div class="auth-seal">&#10003;</div>
+        <h3>Verified Event Entry Pass</h3>
+        <div class="auth-list">
+          <div class="al-item"><span class="check">&#10003;</span> Ticket Verified &amp; Authenticated</div>
+          <div class="al-item"><span class="check">&#10003;</span> Official Event Entry Pass</div>
+          <div class="al-item"><span class="check">&#10003;</span> Unique Ticket Authentication Number: <strong style="color:var(--gold-light);font-family:var(--font-accent);letter-spacing:0.1em;">BL-2026-0847</strong></div>
+          <div class="al-item"><span class="check">&#10003;</span> Fraud Protection Notice &mdash; QR-code verified</div>
+        </div>
+        <p class="auth-notice">
+          "Only tickets verified through this official page are valid for entry to Bandleng Live: Replica Fashion Picnic."
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer id="footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h4>&#10022; Bandleng Live</h4>
+        <p>Replica Fashion Picnic</p>
+        <p style="margin-top:0.5rem;font-size:0.75rem;font-style:italic;color:rgba(255,255,255,0.3);">Where Fashion Meets Lifestyle, Culture, and Experience.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <p>Mr Melvin Mosala Kedise</p>
+        <a href="tel:+26775114953">+267 75 114 953</a>
+        <p>Lobatse, Botswana</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="fb-logo">Bandleng Live &bull; Replica Fashion Picnic</p>
+      <p>&copy; 2026 Bandleng Live. All rights reserved.</p>
+      <p style="margin-top:0.3rem;">Designed with elegance &mdash; every detail matters.</p>
+    </div>
+  </footer>
+
+  <script>
+    // ─── Particles ───
+    (function() {
+      var c = document.getElementById('particles-canvas');
+      var ctx = c.getContext('2d');
+      var particles = [];
+      var w, h;
+
+      function resize() {
+        w = c.width = window.innerWidth;
+        h = c.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      for (var i = 0; i < 80; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.random() * 2 + 0.5,
+          dx: (Math.random() - 0.5) * 0.3,
+          dy: (Math.random() - 0.5) * 0.3,
+          alpha: Math.random() * 0.5 + 0.15
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        for (var i = 0; i < particles.length; i++) {
+          var p = particles[i];
+          p.x += p.dx;
+          p.y += p.dy;
+          if (p.x < 0) p.x = w;
+          if (p.x > w) p.x = 0;
+          if (p.y < 0) p.y = h;
+          if (p.y > h) p.y = 0;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(212, 168, 83, ' + p.alpha + ')';
+          ctx.fill();
+          // connect
+          for (var j = i + 1; j < particles.length; j++) {
+            var q = particles[j];
+            var dx = p.x - q.x;
+            var dy = p.y - q.y;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(q.x, q.y);
+              ctx.strokeStyle = 'rgba(212, 168, 83, ' + (0.06 * (1 - dist / 120)) + ')';
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // ─── Scroll Reveal ───
+    (function() {
+      var els = document.querySelectorAll('.reveal');
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+      els.forEach(function(el) { observer.observe(el); });
+    })();
+
+    // ─── Countdown ───
+    (function() {
+      var target = new Date('2026-09-05T10:00:00+02:00').getTime();
+      function tick() {
+        var now = Date.now();
+        var diff = target - now;
+        if (diff < 0) diff = 0;
+        var d = Math.floor(diff / 86400000);
+        var h = Math.floor((diff % 86400000) / 3600000);
+        var m = Math.floor((diff % 3600000) / 60000);
+        var s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('cd-days').textContent = String(d).padStart(2, '0');
+        document.getElementById('cd-hours').textContent = String(h).padStart(2, '0');
+        document.getElementById('cd-minutes').textContent = String(m).padStart(2, '0');
+        document.getElementById('cd-seconds').textContent = String(s).padStart(2, '0');
+      }
+      tick();
+      setInterval(tick, 1000);
+    })();
+
+
+  </script>
+</body>
+</html>
